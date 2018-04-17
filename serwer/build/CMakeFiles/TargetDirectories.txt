@@ -1,0 +1,7 @@
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/install.dir
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/list_install_components.dir
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/rebuild_cache.dir
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/RootProject.dir
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/install/local.dir
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/install/strip.dir
+/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/edit_cache.dir
