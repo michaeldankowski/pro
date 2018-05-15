@@ -6,5 +6,5 @@ CXX_FLAGS =  -Wall -pthread -O0 -g -std=c++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/projekt/Pulpit/Projekt2018/includes 
+CXX_INCLUDES = -I/home/projekt/Pulpit/pro/klient/includes 
 

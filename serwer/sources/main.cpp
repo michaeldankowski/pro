@@ -1,74 +1,172 @@
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <memory>
-#include <map>
-#include <mutex>
-#include <atomic>
-#include <cstring>
-#include <string>
-#include <fstream>
-#include <netinet/in.h>
+#include <stdio.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#define PORT 8089
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <unistd.h>
+#include <thread>
+#include <iostream>
+#include <fstream>
+#define PORT 8080
 
-int main(int argc, char* argv[])
+struct Header{
+	int msgId;
+	int size;
+	unsigned int content[1];
+};
+
+struct code{
+  int codeId;
+};
+
+struct registration{
+  char username[20];
+  char password[20];
+};
+
+struct Login{
+  char username[20];
+  char password[20];
+};
+
+void thread_client(int socket){
+
+			while(1) {
+
+				char buffer[1024];
+
+				unsigned int headerSize = sizeof(Header);
+
+				int countReceiveChar = 0;
+
+				int result = 0;
+
+				while(countReceiveChar < headerSize) {
+					result = recv( socket ,buffer + countReceiveChar,headerSize-countReceiveChar,0);
+					if( result == -1){
+						break;
+					} else {
+						 countReceiveChar += result;
+					}
+				}
+
+				Header* headerRequest = (Header*) buffer;
+
+				if(headerRequest->msgId == 1){
+					// code codeResponse;
+          //
+					// codeResponse.codeId = 200;
+					// send(socket,&codeResponse,sizeof(code),0);
+          //
+					// recv( socket , buffer, 1024,0);
+					// registration* registrationRequest = (registration*) buffer;
+          //
+					// //zapis do pliku
+					// std::ofstream fileUsers;
+					// fileUsers.open("../users.txt", std::ios_base::app);
+					// fileUsers<<registrationRequest->username<<":"<<registrationRequest->password<<'\n';
+					// fileUsers.close();
+          //
+					// codeResponse.codeId = 200;
+					// send(socket,&codeResponse,sizeof(code),0);
+
+				}
+				else if(headerRequest->msgId == 2){
+
+					unsigned int toRecive = headerRequest->size - sizeof(unsigned int);
+					std::cout << toRecive << '\n';
+
+					int countReceiveCharLogin = 0;
+
+					while(countReceiveCharLogin < toRecive) {
+						result = recv( socket ,buffer + countReceiveChar + countReceiveCharLogin,toRecive-countReceiveCharLogin,0);
+						if( result == -1){
+							break;
+						} else {
+							 countReceiveCharLogin += result;
+						}
+					}
+
+					Header* loginRequest = (Header*) buffer;
+
+					//result = recv( socket ,(char*) loginRequest,loginSize,0);
+					//std::cout << "result: " << result << '\n';
+					//std::cout << loginRequest->password<< '\n';
+					//int result = recv(socket, recv_buffer + recv_len, BUF_SIZE - recv_len, 0);
+
+					 std::cout << ((Login*) loginRequest->content)->username << '\n';
+					// std::cout << ((Login*) loginRequest->content)->password << '\n';
+					std::cout<<"header request: " <<headerRequest->size<<'\n';
+				}
+				else {
+					close(socket);
+					break;
+				}
+
+			}
+}
+
+int main(int argc, char const *argv[])
 {
-
-	
-	struct sockaddr_in address;
-    int sock = 0, valread;
-    struct sockaddr_in serv_addr;
-    char *hello = "Hello from client";
+    int server_fd, new_socket, valread;
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
     char buffer[1024] = {0};
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+
+		//tworzenie pliku
+		std::ifstream ifile("../users.txt");
+		if(ifile.good() == false) {
+			std::ofstream fileUsers("../users.txt");
+			fileUsers.close();
+		}
+
+    // Creating socket file descriptor
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
-        printf("\n Socket creation error \n");
-        return -1;
+        perror("socket failed");
+        exit(EXIT_FAILURE);
     }
 
-    memset(&serv_addr, '0', sizeof(serv_addr));
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
+    // Forcefully attaching socket to the port 8080
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
+                                                  &opt, sizeof(opt)))
     {
-        printf("\nInvalid address/ Address not supported \n");
-        return -1;
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( PORT );
+
+    // Forcefully attaching socket to the port 8080
+    if (bind(server_fd, (struct sockaddr *)&address,
+                                 sizeof(address))<0)
+    {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+    if (listen(server_fd, 9999) < 0)
+    {
+        perror("listen");
+        exit(EXIT_FAILURE);
     }
 
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+while(1){
+
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
+                       (socklen_t*)&addrlen))<0)
     {
-        printf("\nConnection Failed \n");
-        return -1;
+        perror("accept");
+        exit(EXIT_FAILURE);
     }
-    std::cout << sock << '\n';
+		std::cout << new_socket << '\n';
 
-    std::cin.getline(buffer,1024);
+		std::thread t(thread_client,new_socket);
+		t.detach();
+    //send(new_socket , hello , strlen(hello) , 0 );
+    //printf("disconnected\n");
 
-		while(strcmp(buffer, "exit") != 0){
-
-
-
-			send(sock , buffer , strlen(buffer) , 0 );
-      memset(buffer, 0, sizeof buffer);
-      std::cin.getline(buffer,1024);
-
-
-			//cout<<"wartosc buffera: " << buffer[1];
-
-
-  //  send(sock , hello , strlen(hello) , 0 );
-   //	printf("Hello message sent\n");
-    //valread = read( sock , buffer, 1024);
-    //printf("%s\n",buffer );
-
-  }
-    //close(sock);
+	}
     return 0;
-
-	return 0;
 }

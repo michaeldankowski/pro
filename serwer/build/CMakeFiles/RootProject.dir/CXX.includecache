@@ -6,31 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/home/projekt/Pulpit/Projekt2018/sources/main.cpp
-iostream
--
-thread
--
-vector
--
-memory
--
-map
--
-mutex
--
-atomic
--
-cstring
--
-string
--
-fstream
--
-netinet/in.h
+/home/projekt/Pulpit/pro/serwer/sources/main.cpp
+stdio.h
 -
 sys/socket.h
 -
-arpa/inet.h
+stdlib.h
+-
+netinet/in.h
+-
+string.h
+-
+unistd.h
+-
+thread
+-
+iostream
+-
+fstream
 -
 

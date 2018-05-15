@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/projekt/Pulpit/Projekt2018/sources/main.cpp" "/home/projekt/Pulpit/Projekt2018/build/CMakeFiles/RootProject.dir/sources/main.cpp.o"
+  "/home/projekt/Pulpit/pro/klient/sources/main.cpp" "/home/projekt/Pulpit/pro/klient/build/CMakeFiles/RootProject.dir/sources/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
